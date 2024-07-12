@@ -14,6 +14,7 @@ public class Snake {
     private char[][] snakeboard = null;
     
     Queue <Node> q = new LinkedList<Node>();
+    Queue <Node> food = new LinkedList<Node>();
     
     Snake(int row,int col)
     {
@@ -22,13 +23,67 @@ public class Snake {
         {
             Arrays.fill(ch,'O');
         }
-
         q.add(new Node(0,0));
         
-        this.snakeboard[2][3]='X';
-        this.snakeboard[3][1]='X';
-        this.snakeboard[4][4]='X';
-        this.snakeboard[5][2]='X';
+        snakeboard[0][0]='.';
+        
+//        this.snakeboard[2][3]='X';
+//        this.snakeboard[3][1]='X';
+//        this.snakeboard[4][4]='X';
+//        this.snakeboard[5][2]='X';
+        food.add(new Node(2,3));
+        food.add(new Node(3,1));
+        food.add(new Node(4,4));
+        food.add(new Node(5,2));
+        
+        displayfood();
+    }
+    
+    public void startgame()
+    {
+        int row = 0,col=0;
+        while(true)
+        {
+            Printsnakeboard();
+            System.out.print("Enter You move: ");
+            Scanner sc = new Scanner(System.in);
+            char ch = sc.next().charAt(0);
+            switch (ch) {
+                    case 'R':
+                        ++col;
+                        break;
+                    case 'L':
+                        --col;
+                        break;
+                    case 'U':
+                        --row;
+                        break;
+                    case 'D':
+                        ++row;
+                        break;
+                    default:
+                        break;
+                }
+            if(!check(row,col))
+            {
+                if(ch=='R') --col;
+                else if(ch=='L') ++col;
+                else if(ch=='U') ++row;
+                else if(ch=='D') --row;
+                continue;
+            }
+            snakemove(row,col);
+        }
+    }
+    
+    public boolean check(int row, int col)
+    {
+        if(row<0 || row>=snakeboard.length || col<0 || col>=snakeboard[0].length)
+                {
+                    System.out.println("Invalid Move");
+                    return false;
+                }
+        return true;
     }
     
     public void snakemove(int row,int col)
@@ -50,38 +105,12 @@ public class Snake {
                 int c = node.getcol();
                 snakeboard[r][c]='O';
             }
-            snakeboard[row][col]='.';
-            
-            while(!q.isEmpty())
-            {
-                Printsnakeboard();
-                System.out.print("Enter You move: ");
-                Scanner sc = new Scanner(System.in);
-                char ch = sc.next().charAt(0);
-                switch (ch) {
-                    case 'R':
-                        ++col;
-                        break;
-                    case 'L':
-                        --col;
-                        break;
-                    case 'U':
-                        --row;
-                        break;
-                    case 'D':
-                        ++row;
-                        break;
-                    default:
-                        break;
-                }
+            else{
+                snakeboard[row][col]='.';
+                displayfood();
                 
-                if(row<0 || row>=snakeboard.length || col<0 || col>=snakeboard[0].length)
-                {
-                    System.out.println("Invalid Move");
-                    continue;
-                }
-                snakemove(row,col);
             }
+             snakeboard[row][col]='.';  
         }
         else
         {
@@ -89,7 +118,17 @@ public class Snake {
             System.exit(0);
         }
     }
-    
+    public void displayfood()
+    {
+        
+        if(!food.isEmpty())
+        {
+            Node node = food.poll();
+            snakeboard[node.getrow()][node.getcol()]='X';
+            Printsnakeboard();
+            System.out.println(" ");
+        }
+    }
     public void Printsnakeboard()
     {
        for (char[] chars : snakeboard) {
